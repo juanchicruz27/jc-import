@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 
 export async function updateDollarRate(formData: FormData) {
   const rate = parseFloat(formData.get("rate") as string);
-  if (isNaN(rate)) return { error: "Tasa inválida" };
+  if (isNaN(rate)) return;
 
   await prisma.storeSettings.upsert({
     where: { id: "global" },
@@ -14,7 +14,6 @@ export async function updateDollarRate(formData: FormData) {
   });
 
   revalidatePath("/");
-  return { success: true };
 }
 
 export async function createProduct(formData: FormData) {
@@ -31,7 +30,6 @@ export async function createProduct(formData: FormData) {
   });
 
   revalidatePath("/");
-  return { success: true };
 }
 
 export async function deleteProduct(id: string) {
