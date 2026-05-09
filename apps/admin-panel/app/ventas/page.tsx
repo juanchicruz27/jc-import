@@ -5,8 +5,8 @@ import Link from "next/link";
 export const revalidate = 0;
 
 export default async function VentasDashboard() {
-  let sales = [];
-  let products = [];
+  let sales: any[] = [];
+  let products: any[] = [];
   let errorMsg = null;
 
   try {

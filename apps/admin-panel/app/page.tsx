@@ -5,7 +5,7 @@ export const revalidate = 0;
 
 export default async function AdminDashboard() {
   let settings = null;
-  let products = [];
+  let products: any[] = [];
   let errorMsg = null;
   
   try {

@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   transpilePackages: ["database"],
-  serverExternalPackages: ["@prisma/client", "database"]
+  experimental: {
+    serverComponentsExternalPackages: ["@prisma/client"]
+  }
 };
 export default nextConfig;
