@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Product {
@@ -25,4 +26,16 @@ model StoreSettings {
   id         String   @id @default("global")
   dollarRate Float    @default(1000.0)
   updatedAt  DateTime @updatedAt
+}
+
+model Sale {
+  id           String   @id @default(cuid())
+  clientName   String
+  productId    String?
+  productName  String
+  totalAmount  Float
+  status       String   @default("PENDING") // "PENDING" | "PAID"
+  date         DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }

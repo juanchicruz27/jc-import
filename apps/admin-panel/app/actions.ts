@@ -36,3 +36,41 @@ export async function deleteProduct(id: string) {
   await prisma.product.delete({ where: { id } });
   revalidatePath("/");
 }
+
+// Sales Actions
+export async function createSale(formData: FormData) {
+  const clientName = formData.get("clientName") as string;
+  const productId = formData.get("productId") as string;
+  const productName = formData.get("productName") as string;
+  const totalAmount = parseFloat(formData.get("totalAmount") as string);
+  const status = formData.get("status") as string;
+  
+  const dateStr = formData.get("date") as string;
+  const date = dateStr ? new Date(dateStr) : new Date();
+
+  await prisma.sale.create({
+    data: {
+      clientName,
+      productId: productId || null,
+      productName,
+      totalAmount,
+      status,
+      date,
+    }
+  });
+
+  revalidatePath("/ventas");
+}
+
+export async function markSaleAsPaid(id: string) {
+  await prisma.sale.update({
+    where: { id },
+    data: { status: "PAID" }
+  });
+  revalidatePath("/ventas");
+}
+
+export async function deleteSale(id: string) {
+  await prisma.sale.delete({ where: { id } });
+  revalidatePath("/ventas");
+}

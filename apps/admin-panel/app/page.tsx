@@ -10,7 +10,13 @@ export default async function AdminDashboard() {
   return (
     <main className="max-w-6xl mx-auto p-6 text-gray-800">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">JC Import - Panel de Administración</h1>
+        <h1 className="text-3xl font-bold text-gray-900">JC Import - Admin</h1>
+        <a href="/ventas" className="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg font-medium transition shadow-sm flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Dashboard de Ventas
+        </a>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
