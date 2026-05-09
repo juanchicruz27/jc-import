@@ -68,20 +68,6 @@ export default async function VentasDashboard() {
                 <select 
                   name="productId" 
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white"
-                  onChange={(e) => {
-                    const select = e.target;
-                    const option = select.options[select.selectedIndex];
-                    const inputName = document.getElementById("hiddenProductName") as HTMLInputElement;
-                    const inputPrice = document.getElementById("totalAmount") as HTMLInputElement;
-                    
-                    if (option.value) {
-                      inputName.value = option.getAttribute("data-name") || "";
-                      inputPrice.value = option.getAttribute("data-price") || "";
-                    } else {
-                      inputName.value = "";
-                      inputPrice.value = "";
-                    }
-                  }}
                 >
                   <option value="">Seleccionar un producto...</option>
                   {products.map(p => (
@@ -96,9 +82,7 @@ export default async function VentasDashboard() {
               {/* Campos ocultos/dinámicos según producto */}
               <input type="hidden" name="productName" id="hiddenProductName" />
               <div className="mt-2">
-                <input type="text" placeholder="Escribir nombre manual..." className="w-full px-3 py-2 border border-gray-300 rounded-lg hidden" id="manualProductName" onChange={(e) => {
-                  (document.getElementById("hiddenProductName") as HTMLInputElement).value = e.target.value;
-                }}/>
+                <input type="text" placeholder="Escribir nombre manual..." className="w-full px-3 py-2 border border-gray-300 rounded-lg hidden" id="manualProductName" />
               </div>
 
               <div>
@@ -127,15 +111,30 @@ export default async function VentasDashboard() {
             <script dangerouslySetInnerHTML={{__html: `
               document.querySelector('select[name="productId"]').addEventListener('change', function(e) {
                 const manualInput = document.getElementById('manualProductName');
+                const option = e.target.options[e.target.selectedIndex];
+                const inputName = document.getElementById('hiddenProductName');
+                const inputPrice = document.getElementById('totalAmount');
+                
                 if (e.target.value === 'custom') {
                   manualInput.classList.remove('hidden');
                   manualInput.required = true;
-                  document.getElementById('hiddenProductName').value = manualInput.value;
-                  document.getElementById('totalAmount').value = '';
+                  inputName.value = manualInput.value;
+                  inputPrice.value = '';
+                } else if (e.target.value) {
+                  manualInput.classList.add('hidden');
+                  manualInput.required = false;
+                  inputName.value = option.getAttribute('data-name') || '';
+                  inputPrice.value = option.getAttribute('data-price') || '';
                 } else {
                   manualInput.classList.add('hidden');
                   manualInput.required = false;
+                  inputName.value = '';
+                  inputPrice.value = '';
                 }
+              });
+              
+              document.getElementById('manualProductName').addEventListener('input', function(e) {
+                document.getElementById('hiddenProductName').value = e.target.value;
               });
             `}} />
           </div>
