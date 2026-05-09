@@ -43,7 +43,7 @@ export async function createSale(formData: FormData) {
   const productId = formData.get("productId") as string;
   const productName = formData.get("productName") as string;
   const totalAmount = parseFloat(formData.get("totalAmount") as string);
-  const status = formData.get("status") as string;
+  const amountPaid = parseFloat(formData.get("amountPaid") as string) || 0;
   
   const dateStr = formData.get("date") as string;
   const date = dateStr ? new Date(dateStr) : new Date();
@@ -54,7 +54,7 @@ export async function createSale(formData: FormData) {
       productId: productId || null,
       productName,
       totalAmount,
-      status,
+      amountPaid,
       date,
     }
   });
@@ -62,10 +62,14 @@ export async function createSale(formData: FormData) {
   revalidatePath("/ventas");
 }
 
-export async function markSaleAsPaid(id: string) {
+export async function updateSalePayment(formData: FormData) {
+  const id = formData.get("saleId") as string;
+  const newAmountPaid = parseFloat(formData.get("newAmountPaid") as string);
+  if (!id || isNaN(newAmountPaid)) return;
+
   await prisma.sale.update({
     where: { id },
-    data: { status: "PAID" }
+    data: { amountPaid: newAmountPaid }
   });
   revalidatePath("/ventas");
 }

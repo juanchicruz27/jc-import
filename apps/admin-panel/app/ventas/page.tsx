@@ -1,8 +1,16 @@
 import prisma from "database";
-import { createSale, markSaleAsPaid, deleteSale } from "../actions";
+import { createSale, updateSalePayment, deleteSale } from "../actions";
 import Link from "next/link";
 
 export const revalidate = 0;
+
+function formatCurrency(amount: number) {
+  return new Intl.NumberFormat('es-AR', {
+    style: 'currency',
+    currency: 'ARS',
+    minimumFractionDigits: 2
+  }).format(amount);
+}
 
 export default async function VentasDashboard() {
   let sales: any[] = [];
@@ -21,8 +29,8 @@ export default async function VentasDashboard() {
   }
 
   const totalSales = sales.reduce((acc, sale) => acc + sale.totalAmount, 0);
-  const totalCollected = sales.filter(s => s.status === "PAID").reduce((acc, sale) => acc + sale.totalAmount, 0);
-  const totalDebt = sales.filter(s => s.status === "PENDING").reduce((acc, sale) => acc + sale.totalAmount, 0);
+  const totalCollected = sales.reduce((acc, sale) => acc + sale.amountPaid, 0);
+  const totalDebt = totalSales - totalCollected;
   
   return (
     <main className="max-w-6xl mx-auto p-6 text-gray-800">
@@ -40,15 +48,15 @@ export default async function VentasDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 border-l-4 border-l-blue-500">
           <p className="text-sm font-medium text-gray-500 mb-1">Ventas Históricas</p>
-          <p className="text-3xl font-bold text-gray-900">USD {totalSales.toFixed(2)}</p>
+          <p className="text-3xl font-bold text-gray-900">{formatCurrency(totalSales)}</p>
         </div>
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 border-l-4 border-l-green-500">
           <p className="text-sm font-medium text-gray-500 mb-1">Total Cobrado</p>
-          <p className="text-3xl font-bold text-green-600">USD {totalCollected.toFixed(2)}</p>
+          <p className="text-3xl font-bold text-green-600">{formatCurrency(totalCollected)}</p>
         </div>
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 border-l-4 border-l-orange-500">
           <p className="text-sm font-medium text-gray-500 mb-1">En la Calle (Deuda)</p>
-          <p className="text-3xl font-bold text-orange-500">USD {totalDebt.toFixed(2)}</p>
+          <p className="text-3xl font-bold text-orange-500">{formatCurrency(totalDebt)}</p>
         </div>
       </div>
 
@@ -72,7 +80,7 @@ export default async function VentasDashboard() {
                   <option value="">Seleccionar un producto...</option>
                   {products.map(p => (
                     <option key={p.id} value={p.id} data-name={p.name} data-price={p.discountPercentage ? p.priceUSD * (1 - p.discountPercentage/100) : p.priceUSD}>
-                      {p.name} - USD {p.discountPercentage ? (p.priceUSD * (1 - p.discountPercentage/100)).toFixed(2) : p.priceUSD}
+                      {p.name} - {formatCurrency(p.discountPercentage ? (p.priceUSD * (1 - p.discountPercentage/100)) : p.priceUSD)}
                     </option>
                   ))}
                   <option value="custom">Otro (Manual)</option>
@@ -86,16 +94,13 @@ export default async function VentasDashboard() {
               </div>
 
               <div>
-                <label className="block text-sm text-gray-600 mb-1">Monto Total (USD)</label>
+                <label className="block text-sm text-gray-600 mb-1">Monto Total ($)</label>
                 <input type="number" step="0.01" name="totalAmount" id="totalAmount" required className="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="0.00" />
               </div>
 
               <div>
-                <label className="block text-sm text-gray-600 mb-1">Estado</label>
-                <select name="status" className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white">
-                  <option value="PAID">Pagado (Saldo en 0)</option>
-                  <option value="PENDING">Debe (Pago pendiente)</option>
-                </select>
+                <label className="block text-sm text-gray-600 mb-1">Monto Abonado ($)</label>
+                <input type="number" step="0.01" name="amountPaid" id="amountPaid" required className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-green-50" placeholder="0.00" />
               </div>
 
               <div>
@@ -167,51 +172,70 @@ export default async function VentasDashboard() {
                       </td>
                     </tr>
                   )}
-                  {sales.map(sale => (
-                    <tr key={sale.id} className="hover:bg-gray-50 transition">
-                      <td className="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">
-                        {sale.date.toLocaleDateString('es-AR')}
-                      </td>
-                      <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                        {sale.clientName}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        {sale.productName}
-                      </td>
-                      <td className="px-6 py-4 text-sm font-semibold text-gray-900">
-                        USD {sale.totalAmount.toFixed(2)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {sale.status === 'PAID' ? (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            Pagado
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-                            Debe
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                        <div className="flex justify-end gap-2">
-                          {sale.status === 'PENDING' && (
-                            <form action={markSaleAsPaid.bind(null, sale.id)}>
-                              <button type="submit" className="text-green-600 hover:text-green-900 font-medium bg-green-50 hover:bg-green-100 px-3 py-1 rounded transition">
-                                Saldar
+                  {sales.map(sale => {
+                    const diff = sale.totalAmount - sale.amountPaid;
+                    const isFullyPaid = diff <= 0;
+                    const isPendingTotal = sale.amountPaid <= 0;
+                    
+                    return (
+                      <tr key={sale.id} className="hover:bg-gray-50 transition">
+                        <td className="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">
+                          {sale.date.toLocaleDateString('es-AR')}
+                        </td>
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                          {sale.clientName}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-600">
+                          {sale.productName}
+                        </td>
+                        <td className="px-6 py-4 text-sm font-semibold text-gray-900">
+                          {formatCurrency(sale.totalAmount)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {isFullyPaid ? (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                              Pagado
+                            </span>
+                          ) : isPendingTotal ? (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">
+                              Pendiente Total
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 border border-orange-200">
+                              Debe: {formatCurrency(diff)}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 text-right text-sm">
+                          <div className="flex justify-end gap-2 items-center">
+                            {!isFullyPaid && (
+                              <form action={updateSalePayment} className="flex items-center gap-1">
+                                <input type="hidden" name="saleId" value={sale.id} />
+                                <input 
+                                  type="number" 
+                                  step="0.01" 
+                                  name="newAmountPaid" 
+                                  defaultValue={sale.amountPaid} 
+                                  className="w-20 px-2 py-1 text-xs border border-gray-300 rounded text-right"
+                                  title="Actualizar monto abonado"
+                                />
+                                <button type="submit" className="text-blue-600 hover:text-blue-900 font-medium bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded transition text-xs">
+                                  Guardar
+                                </button>
+                              </form>
+                            )}
+                            <form action={deleteSale.bind(null, sale.id)}>
+                              <button type="submit" className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1 rounded transition" title="Eliminar Venta">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                                </svg>
                               </button>
                             </form>
-                          )}
-                          <form action={deleteSale.bind(null, sale.id)}>
-                            <button type="submit" className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1 rounded transition" title="Eliminar Venta">
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                              </svg>
-                            </button>
-                          </form>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
