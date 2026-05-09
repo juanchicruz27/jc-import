@@ -5,9 +5,21 @@ import Link from "next/link";
 export const revalidate = 0;
 
 export default async function VentasDashboard() {
-  const sales = await prisma.sale.findMany({ orderBy: { date: "desc" }});
-  const products = await prisma.product.findMany({ orderBy: { name: "asc" }});
+  let sales = [];
+  let products = [];
+  let errorMsg = null;
+
+  try {
+    sales = await prisma.sale.findMany({ orderBy: { date: "desc" }});
+    products = await prisma.product.findMany({ orderBy: { name: "asc" }});
+  } catch (e: any) {
+    errorMsg = e.message + "\n" + e.stack;
+  }
   
+  if (errorMsg) {
+    return <main className="p-10 text-red-500"><h1 className="text-2xl font-bold">CRASH LOG:</h1><pre className="whitespace-pre-wrap">{errorMsg}</pre></main>;
+  }
+
   const totalSales = sales.reduce((acc, sale) => acc + sale.totalAmount, 0);
   const totalCollected = sales.filter(s => s.status === "PAID").reduce((acc, sale) => acc + sale.totalAmount, 0);
   const totalDebt = sales.filter(s => s.status === "PENDING").reduce((acc, sale) => acc + sale.totalAmount, 0);

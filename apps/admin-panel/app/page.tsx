@@ -4,9 +4,20 @@ import { updateDollarRate, createProduct, deleteProduct } from "./actions";
 export const revalidate = 0;
 
 export default async function AdminDashboard() {
-  const settings = await prisma.storeSettings.findUnique({ where: { id: "global" }});
-  const products = await prisma.product.findMany({ orderBy: { createdAt: "desc" }});
+  let settings = null;
+  let products = [];
+  let errorMsg = null;
   
+  try {
+    settings = await prisma.storeSettings.findUnique({ where: { id: "global" }});
+    products = await prisma.product.findMany({ orderBy: { createdAt: "desc" }});
+  } catch (e: any) {
+    errorMsg = e.message + "\n" + e.stack;
+  }
+  
+  if (errorMsg) {
+    return <main className="p-10 text-red-500"><h1 className="text-2xl font-bold">CRASH LOG:</h1><pre className="whitespace-pre-wrap">{errorMsg}</pre></main>;
+  }
   return (
     <main className="max-w-6xl mx-auto p-6 text-gray-800">
       <div className="flex items-center justify-between mb-8">
