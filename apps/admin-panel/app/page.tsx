@@ -79,8 +79,8 @@ export default async function AdminDashboard() {
                 <input type="number" name="discountPercentage" className="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="Ej. 15" />
               </div>
               <div className="sm:col-span-2">
-                <label className="block text-sm text-gray-600 mb-1">URL de la Imagen (Opcional)</label>
-                <input type="url" name="imageUrl" className="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="https://..." />
+                <label className="block text-sm text-gray-600 mb-1">Imagen del Producto (Opcional)</label>
+                <input type="file" accept="image/*" name="imageFile" className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white" />
               </div>
               <div className="sm:col-span-2 mt-2">
                 <button type="submit" className="w-full bg-green-600 text-white font-medium py-2 rounded-lg hover:bg-green-700 transition">

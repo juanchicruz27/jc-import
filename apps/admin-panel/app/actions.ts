@@ -23,7 +23,14 @@ export async function createProduct(formData: FormData) {
   const discountPercentage = formData.get("discountPercentage") 
     ? parseInt(formData.get("discountPercentage") as string) 
     : null;
-  const imageUrl = formData.get("imageUrl") as string || null;
+  const imageFile = formData.get("imageFile") as File | null;
+  let imageUrl = null;
+  if (imageFile && imageFile.size > 0) {
+    const arrayBuffer = await imageFile.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const base64 = buffer.toString('base64');
+    imageUrl = `data:${imageFile.type};base64,${base64}`;
+  }
 
   await prisma.product.create({
     data: { name, brand, priceUSD, discountPercentage, imageUrl }
