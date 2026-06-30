@@ -32,8 +32,13 @@ export async function createProduct(formData: FormData) {
     imageUrl = `data:${imageFile.type};base64,${base64}`;
   }
 
+  const notesTop = formData.get("notesTop") as string;
+  const notesHeart = formData.get("notesHeart") as string;
+  const notesBase = formData.get("notesBase") as string;
+  const bgColor = formData.get("bgColor") as string || "#ffffff";
+
   await prisma.product.create({
-    data: { name, brand, priceUSD, discountPercentage, imageUrl }
+    data: { name, brand, priceUSD, discountPercentage, imageUrl, notesTop, notesHeart, notesBase, bgColor }
   });
 
   revalidatePath("/");
@@ -66,7 +71,7 @@ export async function createSale(formData: FormData) {
     }
   });
 
-  revalidatePath("/ventas");
+  revalidatePath("/");
 }
 
 export async function updateSalePayment(formData: FormData) {
@@ -78,10 +83,10 @@ export async function updateSalePayment(formData: FormData) {
     where: { id },
     data: { amountPaid: newAmountPaid }
   });
-  revalidatePath("/ventas");
+  revalidatePath("/");
 }
 
 export async function deleteSale(id: string) {
   await prisma.sale.delete({ where: { id } });
-  revalidatePath("/ventas");
+  revalidatePath("/");
 }
