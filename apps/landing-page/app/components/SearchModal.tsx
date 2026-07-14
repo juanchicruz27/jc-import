@@ -16,21 +16,33 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
       <div className="bg-[#e8e6e1] w-full max-w-2xl rounded-sm shadow-2xl overflow-hidden animate-in slide-in-from-top-4 duration-300">
         
         {/* Input area */}
-        <div className="flex items-center border-b border-zinc-300 px-4 py-4">
+        <form 
+          onSubmit={(e) => {
+            e.preventDefault();
+            const form = e.target as HTMLFormElement;
+            const input = form.elements.namedItem('searchQuery') as HTMLInputElement;
+            if (input.value.trim()) {
+              window.location.href = `/search?q=${encodeURIComponent(input.value.trim())}`;
+            }
+          }}
+          className="flex items-center border-b border-zinc-300 px-4 py-4"
+        >
           <Search size={20} className="text-zinc-500 mr-3" />
           <input 
             type="text" 
+            name="searchQuery"
             placeholder="Buscar productos..."
             className="flex-grow bg-transparent outline-none text-zinc-800 text-lg placeholder:text-zinc-500"
             autoFocus
           />
           <button 
+            type="button"
             onClick={onClose}
             className="text-xs font-semibold text-zinc-600 hover:text-black ml-4 px-2 tracking-widest"
           >
             ESC
           </button>
-        </div>
+        </form>
 
         {/* Suggestions area */}
         <div className="px-6 py-6 pb-8">
@@ -40,13 +52,14 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
           </h4>
           
           <div className="flex flex-wrap gap-2">
-            {['Lattafa', 'Xerjoff', 'Perfumes Árabes', 'Club de Nuit'].map((term) => (
-              <button 
+            {['Lattafa', 'Xerjoff', 'Club de Nuit'].map((term) => (
+              <a 
                 key={term}
+                href={`/search?q=${encodeURIComponent(term)}`}
                 className="px-4 py-1.5 border border-zinc-300 rounded-sm text-sm text-zinc-700 hover:bg-zinc-200 transition-colors"
               >
                 {term}
-              </button>
+              </a>
             ))}
           </div>
         </div>

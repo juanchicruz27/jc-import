@@ -6,17 +6,45 @@ import { notFound } from "next/navigation";
 export const revalidate = 0;
 
 export default async function ProductPage({ params }: { params: { id: string } }) {
-  const product = await prisma.product.findUnique({
-    where: { id: params.id }
-  });
+  let product = null;
+  let dollarRate = 1000;
+  let dbError = false;
+
+  try {
+    product = await prisma.product.findUnique({
+      where: { id: params.id }
+    });
+
+    const settings = await prisma.storeSettings.findUnique({ where: { id: "global" } });
+    if (settings?.dollarRate) {
+      dollarRate = settings.dollarRate;
+    }
+  } catch (error) {
+    console.error("Database connection error:", error);
+    dbError = true;
+  }
+
+  if (dbError) {
+    return (
+      <main className="min-h-screen bg-[#e8e6e1] font-sans px-6 py-12 flex items-center justify-center">
+        <div className="text-center py-20 bg-red-50/50 rounded-xl border border-red-200 p-8 max-w-lg w-full">
+          <h2 className="text-red-600 font-bold text-xl mb-2">Error de conexión a la base de datos</h2>
+          <p className="text-red-500/80 mb-6">
+            No pudimos conectar con la base de datos de Supabase. Es posible que el proyecto esté pausado por inactividad. 
+            Por favor, reactiva el proyecto desde el panel de Supabase.
+          </p>
+          <Link href="/" className="inline-block px-6 py-3 bg-red-600 text-white font-bold text-sm tracking-widest uppercase hover:bg-red-700 transition-colors rounded-lg">
+            Volver al inicio
+          </Link>
+        </div>
+      </main>
+    );
+  }
 
   if (!product) {
     notFound();
   }
 
-  const settings = await prisma.storeSettings.findUnique({ where: { id: "global" } });
-  const dollarRate = settings?.dollarRate ?? 1000;
-  
   const hasDiscount = product.discountPercentage && product.discountPercentage > 0;
   const finalPriceUSD = hasDiscount 
     ? product.priceUSD * (1 - product.discountPercentage! / 100) 
