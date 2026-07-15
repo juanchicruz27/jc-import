@@ -177,8 +177,8 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
                   defaultValue="Unisex"
                 >
                   <option value="Unisex">Unisex</option>
-                  <option value="Masculino">Masculino</option>
-                  <option value="Femenino">Femenino</option>
+                  <option value="Hombre">Hombre</option>
+                  <option value="Mujer">Mujer</option>
                 </select>
               </div>
 

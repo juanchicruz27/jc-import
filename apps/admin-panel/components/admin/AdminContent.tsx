@@ -149,8 +149,8 @@ export default function AdminContent({ initialProducts, initialDollarRate, initi
                           }}
                         >
                           <option value="Unisex">Unisex</option>
-                          <option value="Masculino">Masculino</option>
-                          <option value="Femenino">Femenino</option>
+                          <option value="Hombre">Hombre</option>
+                          <option value="Mujer">Mujer</option>
                         </select>
                       </td>
                       <td className="p-5 font-bold text-zinc-900">${product.priceUSD}</td>

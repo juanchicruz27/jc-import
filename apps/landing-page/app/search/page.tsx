@@ -82,8 +82,13 @@ export default async function SearchPage({
                       <ShoppingBag size={40} className="text-zinc-300" />
                     )}
                     {hasDiscount && (
-                      <div className="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-black px-2 py-1 uppercase rounded-sm z-10">
+                      <div className="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-black px-2 py-1 uppercase rounded-sm z-10 shadow-sm">
                         -{product.discount}% OFF
+                      </div>
+                    )}
+                    {product.gender === 'Unisex' && (
+                      <div className="absolute top-3 right-3 bg-zinc-900/80 backdrop-blur-md text-white text-[10px] font-black px-3 py-1 uppercase rounded-full z-10 shadow-sm border border-white/10 tracking-widest">
+                        UNISEX
                       </div>
                     )}
                   </div>

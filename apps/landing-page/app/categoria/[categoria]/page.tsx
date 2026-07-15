@@ -21,13 +21,13 @@ export default async function CategoriaPage({
   let dollarRate = 1000;
   let dbError = false;
 
-  const genderFilter = params.categoria === 'masculinas' ? 'Masculino' 
-    : params.categoria === 'femeninas' ? 'Femenino'
-    : 'Unisex';
+  const genderFilter = params.categoria === 'masculinas' ? ['Hombre', 'Unisex'] 
+    : params.categoria === 'femeninas' ? ['Mujer', 'Unisex']
+    : ['Unisex'];
 
   try {
     products = await prisma.product.findMany({
-      where: { gender: genderFilter },
+      where: { gender: { in: genderFilter } },
       orderBy: { createdAt: "desc" },
     });
 
@@ -85,8 +85,13 @@ export default async function CategoriaPage({
                       <ShoppingBag size={40} className="text-zinc-300" />
                     )}
                     {hasDiscount && (
-                      <div className="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-black px-2 py-1 uppercase rounded-sm z-10">
+                      <div className="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-black px-2 py-1 uppercase rounded-sm z-10 shadow-sm">
                         -{product.discount}% OFF
+                      </div>
+                    )}
+                    {product.gender === 'Unisex' && (
+                      <div className="absolute top-3 right-3 bg-zinc-900/80 backdrop-blur-md text-white text-[10px] font-black px-3 py-1 uppercase rounded-full z-10 shadow-sm border border-white/10 tracking-widest">
+                        UNISEX
                       </div>
                     )}
                   </div>
