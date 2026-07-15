@@ -12,10 +12,10 @@ export default async function ProductPage({ params }: { params: { id: string } }
 
   try {
     product = await prisma.product.findUnique({
-      where: { id: params.id }
+      where: { slug: params.id }
     });
 
-    const settings = await prisma.storeSettings.findUnique({ where: { id: "global" } });
+    const settings = await prisma.settings.findUnique({ where: { id: "global" } });
     if (settings?.dollarRate) {
       dollarRate = settings.dollarRate;
     }
@@ -45,9 +45,9 @@ export default async function ProductPage({ params }: { params: { id: string } }
     notFound();
   }
 
-  const hasDiscount = product.discountPercentage && product.discountPercentage > 0;
+  const hasDiscount = product.discount && product.discount > 0;
   const finalPriceUSD = hasDiscount 
-    ? product.priceUSD * (1 - product.discountPercentage! / 100) 
+    ? product.priceUSD * (1 - product.discount / 100) 
     : product.priceUSD;
   const finalPriceARS = finalPriceUSD * dollarRate;
 
@@ -62,9 +62,9 @@ export default async function ProductPage({ params }: { params: { id: string } }
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
           {/* Image Section */}
           <div className="relative aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl group border border-white/10">
-            {product.imageUrl ? (
+            {product.imagePath ? (
               <img 
-                src={product.imageUrl} 
+                src={product.imagePath} 
                 alt={product.name} 
                 className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700" 
               />
@@ -91,7 +91,7 @@ export default async function ProductPage({ params }: { params: { id: string } }
                 </p>
                 {hasDiscount && (
                   <span className="bg-red-600 text-white text-xs font-black px-3 py-1.5 rounded-full">
-                    -{product.discountPercentage}% OFF
+                    -{product.discount}% OFF
                   </span>
                 )}
               </div>

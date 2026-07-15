@@ -10,7 +10,7 @@ export default async function AdminDashboard() {
   let errorMsg = null;
   
   try {
-    settings = await prisma.storeSettings.findUnique({ where: { id: "global" }});
+    settings = await prisma.settings.findUnique({ where: { id: "global" }});
     products = await prisma.product.findMany({ orderBy: { createdAt: "desc" }});
     sales = await prisma.sale.findMany({ orderBy: { date: "desc" }});
   } catch (e: any) {

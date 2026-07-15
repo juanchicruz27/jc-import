@@ -90,8 +90,8 @@ export default function AdminContent({ initialProducts, initialDollarRate, initi
                 {initialProducts.slice(0, 4).map(p => (
                   <div key={p.id} className="border border-zinc-100 rounded-2xl p-4 hover:shadow-md transition-shadow">
                     <div className="w-full h-32 mb-4 rounded-lg bg-zinc-50 overflow-hidden flex items-center justify-center">
-                      {p.imageUrl ? (
-                        <img src={p.imageUrl} className="w-full h-full object-contain" alt={p.name} />
+                      {p.imagePath ? (
+                        <img src={p.imagePath} className="w-full h-full object-contain" alt={p.name} />
                       ) : (
                         <Package size={32} className="text-zinc-200" />
                       )}
@@ -118,6 +118,7 @@ export default function AdminContent({ initialProducts, initialDollarRate, initi
                   <tr className="bg-zinc-50/50 border-b border-zinc-100">
                     <th className="p-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest">Producto</th>
                     <th className="p-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest">Marca</th>
+                    <th className="p-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest">Categoría</th>
                     <th className="p-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest">Precio (USD)</th>
                     <th className="p-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest text-right">Acciones</th>
                   </tr>
@@ -128,8 +129,8 @@ export default function AdminContent({ initialProducts, initialDollarRate, initi
                       <td className="p-5">
                         <div className="flex items-center gap-4">
                           <div className="w-12 h-12 rounded-lg border border-zinc-100 overflow-hidden flex items-center justify-center bg-zinc-50">
-                            {product.imageUrl ? (
-                              <img src={product.imageUrl} className="w-full h-full object-cover" alt={product.name} />
+                            {product.imagePath ? (
+                              <img src={product.imagePath} className="w-full h-full object-cover" alt={product.name} />
                             ) : (
                               <Package size={20} className="text-zinc-200" />
                             )}
@@ -138,6 +139,20 @@ export default function AdminContent({ initialProducts, initialDollarRate, initi
                         </div>
                       </td>
                       <td className="p-5 text-zinc-500 font-medium">{product.brand}</td>
+                      <td className="p-5">
+                        <select 
+                          className="bg-transparent border border-zinc-200 rounded p-1 text-sm outline-none focus:border-green-500 text-zinc-700"
+                          defaultValue={product.gender || 'Unisex'}
+                          onChange={async (e) => {
+                            const { updateProductCategory } = await import('@/app/actions');
+                            await updateProductCategory(product.id, e.target.value);
+                          }}
+                        >
+                          <option value="Unisex">Unisex</option>
+                          <option value="Masculino">Masculino</option>
+                          <option value="Femenino">Femenino</option>
+                        </select>
+                      </td>
                       <td className="p-5 font-bold text-zinc-900">${product.priceUSD}</td>
                       <td className="p-5 text-right">
                         <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">

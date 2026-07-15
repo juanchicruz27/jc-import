@@ -26,7 +26,7 @@ export default async function SearchPage({
       orderBy: { createdAt: "desc" },
     });
 
-    const settings = await prisma.storeSettings.findUnique({ where: { id: "global" } });
+    const settings = await prisma.settings.findUnique({ where: { id: "global" } });
     if (settings?.dollarRate) {
       dollarRate = settings.dollarRate;
     }
@@ -63,18 +63,18 @@ export default async function SearchPage({
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {products.map((product) => {
-              const hasDiscount = product.discountPercentage && product.discountPercentage > 0;
+              const hasDiscount = product.discount && product.discount > 0;
               const finalPriceUSD = hasDiscount 
-                ? product.priceUSD * (1 - product.discountPercentage! / 100) 
+                ? product.priceUSD * (1 - product.discount / 100) 
                 : product.priceUSD;
               const finalPriceARS = finalPriceUSD * dollarRate;
 
               return (
-                <Link key={product.id} href={`/producto/${product.id}`} className="group block bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden border border-zinc-200">
+                <Link key={product.id} href={`/producto/${product.slug}`} className="group block bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden border border-zinc-200">
                   <div className="aspect-[4/5] relative bg-zinc-100 overflow-hidden flex items-center justify-center">
-                    {product.imageUrl ? (
+                    {product.imagePath ? (
                       <img 
-                        src={product.imageUrl} 
+                        src={product.imagePath} 
                         alt={product.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
@@ -83,7 +83,7 @@ export default async function SearchPage({
                     )}
                     {hasDiscount && (
                       <div className="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-black px-2 py-1 uppercase rounded-sm z-10">
-                        -{product.discountPercentage}% OFF
+                        -{product.discount}% OFF
                       </div>
                     )}
                   </div>

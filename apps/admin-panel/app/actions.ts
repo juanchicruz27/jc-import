@@ -7,10 +7,10 @@ export async function updateDollarRate(formData: FormData) {
   const rate = parseFloat(formData.get("rate") as string);
   if (isNaN(rate)) return;
 
-  await prisma.storeSettings.upsert({
+  await prisma.settings.upsert({
     where: { id: "global" },
     update: { dollarRate: rate },
-    create: { id: "global", dollarRate: rate }
+    create: { id: "global", dollarRate: rate, updatedAt: new Date() }
   });
 
   revalidatePath("/");
@@ -20,25 +20,43 @@ export async function createProduct(formData: FormData) {
   const name = formData.get("name") as string;
   const brand = formData.get("brand") as string;
   const priceUSD = parseFloat(formData.get("priceUSD") as string);
-  const discountPercentage = formData.get("discountPercentage") 
-    ? parseInt(formData.get("discountPercentage") as string) 
-    : null;
+  const discount = formData.get("discount") 
+    ? parseFloat(formData.get("discount") as string) 
+    : 0;
   const imageFile = formData.get("imageFile") as File | null;
-  let imageUrl = null;
+  let imagePath = null;
   if (imageFile && imageFile.size > 0) {
     const arrayBuffer = await imageFile.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     const base64 = buffer.toString('base64');
-    imageUrl = `data:${imageFile.type};base64,${base64}`;
+    imagePath = `data:${imageFile.type};base64,${base64}`;
   }
 
   const notesTop = formData.get("notesTop") as string;
   const notesHeart = formData.get("notesHeart") as string;
   const notesBase = formData.get("notesBase") as string;
   const bgColor = formData.get("bgColor") as string || "#ffffff";
+  const gender = formData.get("gender") as string || "Unisex";
+  
+  // generate a basic slug
+  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Date.now();
 
   await prisma.product.create({
-    data: { name, brand, priceUSD, discountPercentage, imageUrl, notesTop, notesHeart, notesBase, bgColor }
+    data: { 
+      id: Math.random().toString(36).substring(2, 15), 
+      slug, 
+      name, 
+      brand, 
+      priceUSD, 
+      discount, 
+      imagePath, 
+      notesTop, 
+      notesHeart, 
+      notesBase, 
+      bgColor, 
+      gender,
+      updatedAt: new Date()
+    }
   });
 
   revalidatePath("/");
@@ -46,6 +64,14 @@ export async function createProduct(formData: FormData) {
 
 export async function deleteProduct(id: string) {
   await prisma.product.delete({ where: { id } });
+  revalidatePath("/");
+}
+
+export async function updateProductCategory(id: string, gender: string) {
+  await prisma.product.update({
+    where: { id },
+    data: { gender }
+  });
   revalidatePath("/");
 }
 
@@ -62,12 +88,14 @@ export async function createSale(formData: FormData) {
 
   await prisma.sale.create({
     data: {
+      id: Math.random().toString(36).substring(2, 15),
       clientName,
       productId: productId || null,
       productName,
       totalAmount,
       amountPaid,
       date,
+      updatedAt: new Date()
     }
   });
 

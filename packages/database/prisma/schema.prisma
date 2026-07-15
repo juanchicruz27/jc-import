@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,35 +8,65 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-model Product {
-  id                 String   @id @default(cuid())
-  name               String
-  brand              String
-  priceUSD           Float
-  discountPercentage Int?
-  imageUrl           String?
-  notesTop           String?
-  notesHeart         String?
-  notesBase          String?
-  bgColor            String?  @default("#ffffff")
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+model Banner {
+  id        String   @id
+  imagePath String
+  link      String   @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime
 }
 
-model StoreSettings {
-  id         String   @id @default("global")
-  dollarRate Float    @default(1000.0)
-  updatedAt  DateTime @updatedAt
+model MegaMenuBrand {
+  id        String   @id
+  name      String
+  logoPath  String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+}
+
+model Product {
+  id              String   @id
+  name            String
+  brand           String
+  priceUSD        Float
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime
+  bgColor         String?  @default("#ffffff")
+  notesBase       String?
+  notesHeart      String?
+  notesTop        String?
+  discount        Float    @default(0)
+  imagePath       String?
+  inStock         Boolean  @default(true)
+  slug            String   @unique
+  volumeMl        Int      @default(100)
+  homepageOrder   Int      @default(0)
+  homepageSection String?  @default("NINGUNO")
+  gender          String   @default("Unisex")
 }
 
 model Sale {
-  id           String   @id @default(cuid())
-  clientName   String
-  productId    String?
-  productName  String
-  totalAmount  Float
-  amountPaid   Float    @default(0)
-  date         DateTime @default(now())
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id          String   @id
+  clientName  String
+  productId   String?
+  productName String
+  totalAmount Float
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime
+  amountPaid  Float    @default(0)
+}
+
+model Settings {
+  id               String   @id @default("1")
+  dollarRate       Float    @default(1000)
+  updatedAt        DateTime
+  address          String   @default("Brandsen, 257, Formosa")
+  phone            String   @default("+541124072012")
+  whatsapp         String   @default("+541124072012")
+  filtersPosition  String   @default("izquierda")
+  promoBannerPath  String   @default("/beauty_sale_banner.jpg")
+  showPromoCard    Boolean  @default(true)
+  novedadProductId String?
 }

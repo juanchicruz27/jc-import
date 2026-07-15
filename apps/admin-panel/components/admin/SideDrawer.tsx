@@ -116,7 +116,7 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
                 <div>
                   <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Descuento (%)</label>
                   <input 
-                    name="discountPercentage"
+                    name="discount"
                     type="number" 
                     className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-green-500 outline-none transition-all"
                     placeholder="0"
@@ -167,6 +167,19 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
                     className="w-12 h-12 rounded cursor-pointer border-none p-0"
                   />
                 </div>
+              </div>
+
+              <div className="border-t pt-4">
+                <label className="block text-sm font-bold text-gray-700 mb-2">Categoría / Género</label>
+                <select 
+                  name="gender" 
+                  className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-green-500 outline-none transition-all"
+                  defaultValue="Unisex"
+                >
+                  <option value="Unisex">Unisex</option>
+                  <option value="Masculino">Masculino</option>
+                  <option value="Femenino">Femenino</option>
+                </select>
               </div>
 
               <div>
