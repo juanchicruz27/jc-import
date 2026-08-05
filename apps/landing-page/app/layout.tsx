@@ -5,8 +5,24 @@ import Header from "./components/Header";
 
 
 export const metadata: Metadata = {
-  title: "JC Import - Premium Fragrances",
-  description: "Perfumes importados de lujo",
+  title: "JC Import - Catálogo de perfumería",
+  description: "Catálogo de perfumería",
+  openGraph: {
+    title: "JC Import - Catálogo de perfumería",
+    description: "Catálogo de perfumería",
+    url: "https://jc-import.vercel.app",
+    siteName: "JC Import",
+    images: [
+      {
+        url: "/logo.png",
+        width: 1200,
+        height: 630,
+        alt: "JC Import Logo",
+      }
+    ],
+    locale: "es_AR",
+    type: "website",
+  }
 };
 
 export default function RootLayout({
